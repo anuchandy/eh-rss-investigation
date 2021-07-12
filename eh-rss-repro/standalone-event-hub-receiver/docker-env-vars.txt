@@ -1,6 +1,0 @@
-EH_NS_CON_PROCESSOR=Endpoint=sb://<eh-namespace-name>-eventhubs.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=<key>
-EH_NAME_PROCESSOR=<eh-name>
-EH_CG_NAME_PROCESSOR=<eh-consumer-group-name>
-EH_STG_URL_PROCESSOR=https://<stg-account-name>.blob.core.windows.net/
-EH_STG_CON_STR_PROCESSOR=DefaultEndpointsProtocol=https;AccountName=<stg-account-name>;AccountKey=<key>;EndpointSuffix=core.windows.net
-EH_USE_INMEMORY_STATE_PROCESSOR=False
