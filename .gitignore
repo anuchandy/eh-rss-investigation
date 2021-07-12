@@ -23,6 +23,7 @@ extlib/
 # Auth files
 *.auth
 *.azureauth
+*docker-env-vars.txt
 
 # Local checkstyle
 *.checkstyle
