@@ -33,6 +33,8 @@ EH_STG_CON_STR_PROCESSOR=DefaultEndpointsProtocol=https;AccountName=<stg-account
 EH_USE_INMEMORY_STATE_PROCESSOR=False 
 ```
 
+> Note: While you can share the EH instance for both projects, you'll need to create two consumer groups, one for each project and use that as the value of `EH_CG_NAME_PROCESSOR`
+
 ```
 eh-rss-repro
  |
@@ -82,25 +84,26 @@ The "main-jar-file" has `META-INF\MANIFEST.MF` file setting the `Class-Path` wit
 
 Now you can use the `Dockerfile` in each project to deploy the `dependency-jar` dir and "main-jar-file" to two container instances.
 
-> Note: The `Dockerfile` file download the `JProfiler-Agent` [jprofiler_linux_11_1_4.tar.gz](https://download-gcdn.ej-technologies.com/jprofiler/jprofiler_linux_11_1_4.tar.gz) and exposes the agent port `8849`. 
+> Note_1: The `Dockerfile` file download the `JProfiler-Agent` [jprofiler_linux_11_1_4.tar.gz](https://download-gcdn.ej-technologies.com/jprofiler/jprofiler_linux_11_1_4.tar.gz) and exposes the agent port `8849`. 
 > This enables us to attach `JProfiler` running on the host machine to the JVM in the containers and profile it.
 > If you don't want to profile, then comment out JProfiler related entries from `Dockerfile`.
-> One thing to note is, the version of `JProfiler` in the host machine and `JProfiler-Agent` (that Dockerfile pulls) must match. You can find the version of `JProfiler` in the host machine from the menu-option `About`  e.g. `JProfiler 11.1.4`.
+
+> Note_2: The version of `JProfiler` in the host machine and `JProfiler-Agent` (that Dockerfile pulls) must match. You can find the version of `JProfiler` in the host machine from the menu-option `About`  e.g. `JProfiler 11.1.4`.
 > So for the `JProfiler` version 11.1.4, the corresponding `JProfiler-Agent` is - https://download-gcdn.ej-technologies.com/jprofiler/jprofiler_linux_11_1_4.tar.gz
 > The Dockerfile is hardcoded to download `jprofiler_linux_11_1_4.tar.gz`, change the version-part if you have a different `JProfiler` version in host machine.
 
 #### Build docker-images:
 
 ```
->/eh-rss-investigation/eh-rss-repro/standalone-event-hub-receiver$ docker build -f Dockerfile -t rssrepro/standalone-event-hub-receiver .
->/eh-rss-investigation/eh-rss-repro/standalone-event-hub-receiver-old$ docker build -f Dockerfile -t rssrepro/standalone-event-hub-receiver-old .
+>standalone-event-hub-receiver$ docker build -f Dockerfile -t rssrepro/standalone-event-hub-receiver .
+>standalone-event-hub-receiver-old$ docker build -f Dockerfile -t rssrepro/standalone-event-hub-receiver-old .
 ```
 
 <details><summary>Example output of "docker build"</summary>
 
 ```
 
-anuthomaschandy@lipeng-43933457: ~/eh-rss-investigation/eh-rss-repro/standalone-event-hub-receiver$main$ docker build -f Dockerfile -t rssrepro/standalone-event-hub-receiver .
+anuthomaschandy@lipeng-43933457: standalone-event-hub-receiver$main$ docker build -f Dockerfile -t rssrepro/standalone-event-hub-receiver .
 [+] Building 46.6s (11/11) FINISHED                                                                                                                                                                                                    
  => [internal] load build definition from Dockerfile                                                                                                                                                                              0.0s
  => => transferring dockerfile: 1.12kB                                                                                                                                                                                            0.0s
@@ -127,14 +130,14 @@ anuthomaschandy@lipeng-43933457: ~/eh-rss-investigation/eh-rss-repro/standalone-
 #### Run container using the above images:
 
 ```
->/eh-rss-investigation/eh-rss-repro/standalone-event-hub-receiver$ docker run --rm -p 8848:8849 --env-file docker-env-vars.txt rssrepro/standalone-event-hub-receiver
->/eh-rss-investigation/eh-rss-repro/standalone-event-hub-receiver-old$ docker run --rm -p 8850:8849 --env-file docker-env-vars.txt rssrepro/standalone-event-hub-receiver-old
+>standalone-event-hub-receiver$ docker run --rm -p 8848:8849 --env-file docker-env-vars.txt rssrepro/standalone-event-hub-receiver
+>standalone-event-hub-receiver-old$ docker run --rm -p 8850:8849 --env-file docker-env-vars.txt rssrepro/standalone-event-hub-receiver-old
 ```
 
 <details><summary>Example output of "docker run"</summary>
 
 ```
-anuthomaschandy@lipeng-43933457: ~/eh-rss-investigation/eh-rss-repro/standalone-event-hub-receiver$main$ docker run --rm -p 8848:8849 --env-file docker-env-vars.txt rssrepro/standalone-event-hub-receiver
+anuthomaschandy@lipeng-43933457: standalone-event-hub-receiver$main$ docker run --rm -p 8848:8849 --env-file docker-env-vars.txt rssrepro/standalone-event-hub-receiver
 JProfiler> Protocol version 63
 JProfiler> Java 11 detected.
 JProfiler> 64-bit library
