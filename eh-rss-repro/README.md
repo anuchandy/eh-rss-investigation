@@ -177,7 +177,7 @@ CONTAINER ID   IMAGE                                    COMMAND                 
 37b3c14273d3   rssrepro/standalone-event-hub-receiver   "java -agentpath:/us…"   14 minutes ago   Up 14 minutes   0.0.0.0:8848->8849/tcp, :::8848->8849/tcp   sleepy_sanderson
 ```
 
-The Id (e.g. 37b3c14273d3) of the container can be used to output RRS usage:
+The Id (e.g. 37b3c14273d3) of the container can be used to output RSS usage:
 
 ```
 $ docker exec -it 37b3c14273d3 ps -o pid,user,vsz,rss,comm,args
@@ -185,3 +185,16 @@ PID   USER     VSZ  RSS  COMMAND          COMMAND
     1 root     2.2g 357m java             java -agentpath:/usr/local/jprofiler1
 ```
 
+The script `util-scripts/capture-container-rss.py` can be used to record the RSS in every 10 minutes into a file.
+
+```
+python capture-container-rss.py <containerId>
+```
+
+E.g:
+
+```
+python capture-container-rss.py 37b3c14273d3
+```
+
+Executing above command creates a CSV file with name `rss-captured-<containerId>.csv` and captures the RSS.

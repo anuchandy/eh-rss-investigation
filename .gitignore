@@ -20,6 +20,8 @@ readme_overview.html
 #External libs
 extlib/
 
+*rss-captured-*
+
 # Auth files
 *.auth
 *.azureauth
