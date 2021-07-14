@@ -1,12 +1,14 @@
-### Prerequisite:
+## Prerequisite:
 
 You'll need [docker-desktop](https://www.docker.com/products/docker-desktop) to run the java projects under `eh-rss-repro` in containers.
 
-### Project Structure:
+## Project Structure:
 
-Under `eh-rss-repro`, there are two projects, each exercising the event hub receive API;
-The project `standalone-event-hub-receiver` uses the latest EH SDK.
-The project `standalone-event-hub-receiver-old` uses the old (Track1) EH SDK.
+Under `eh-rss-repro`, there are two java-projects, each exercising the event hub receive API;
+The java-project `standalone-event-hub-receiver` uses the latest EH SDK.
+The java-project `standalone-event-hub-receiver-old` uses the old (Track1) EH SDK.
+
+In addition to these two java-projects, there is a directory `alpine-mimalloc`, We'll come back to `alpine-mimalloc` after exploring the java-projects first.
 
 ```
 eh-rss-repro
@@ -198,3 +200,13 @@ python capture-container-rss.py 37b3c14273d3
 ```
 
 Executing above command creates a CSV file with name `rss-captured-<containerId>.csv` and captures the RSS.
+
+### alpine-mimalloc directory:
+
+The `Dockerfile` in the above two java-projects uses Alpine Linux image with the clib library, `musl`, that comes with by default with the image. The `musl` has a default memory-allocator implementation.
+
+The directory `alpine-mimalloc` contains a `Dockerfile` which overrides the default memory-allocator with another allocator implementation (`mimalloc`) from Microsoft.
+
+Additionally, this `Dockerfile` copies the artifacts `standalone-event-hub-receiver.jar` and `dependency-jars` from the java-project `standalone-event-hub-receiver`, so you'll need to build that java-project first (have the artifacts in its `target` directory) then run the docker file.
+
+For more info on `mimalloc` see the [git-repo](https://github.com/microsoft/mimalloc) and the blog [blog](https://www.linkedin.com/pulse/testing-alternative-c-memory-allocators-pt-2-musl-mystery-gomes/).

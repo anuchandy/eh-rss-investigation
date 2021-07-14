@@ -1,12 +1,6 @@
 FROM mcr.microsoft.com/java/jdk:11-zulu-alpine
 CMD uname
 
-RUN apk add libc6-compat
-RUN ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2
-
-FROM mcr.microsoft.com/java/jdk:11-zulu-alpine
-CMD uname
-
 # artifact: copy the main jar and dir containing dependency jars
 ADD target/standalone-event-hub-receiver.jar /run/standalone-event-hub-receiver.jar
 COPY target/dependency-jars /run/dependency-jars
