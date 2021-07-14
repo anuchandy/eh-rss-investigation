@@ -1,7 +1,6 @@
 package com.conniey;
 
 import com.azure.messaging.eventhubs.checkpointstore.blob.BlobCheckpointStore;
-import com.azure.messaging.eventhubs.models.EventHubConnectionStringProperties;
 import com.azure.messaging.eventhubs.models.PartitionOwnership;
 import com.azure.storage.blob.BlobContainerAsyncClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
@@ -20,14 +19,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Program {
-    private static final String CONNECTION_STRING = System.getenv("EH_NS_CON_PROCESSOR");
-    private static final String EVENT_HUB_NAME = System.getenv("EH_NAME_PROCESSOR");
-    private static final String CONSUMER_GROUP = System.getenv("EH_CG_NAME_PROCESSOR");
     private static final String STORAGE_CONNECTION_STRING = System.getenv("EH_STG_CON_STR_PROCESSOR");
-
     private final Sinks.Empty<Void> onComplete = Sinks.empty();
-    private final EventHubConnectionStringProperties properties;
     private final BlobCheckpointStore checkpointStore;
+    private final String fullyQualifiedNamespace;
     private final String eventHubName;
     private final String consumerGroup;
     private final String ownerId;
@@ -44,17 +39,17 @@ public class Program {
                 ? containerClient.delete().then(containerClient.create())
                 : containerClient.create()).block();
 
-        final EventHubConnectionStringProperties properties = EventHubConnectionStringProperties.parse(CONNECTION_STRING);
-        final Program program = new Program(properties, containerClient, EVENT_HUB_NAME, CONSUMER_GROUP, 4);
+        final Program program = new Program(containerClient, "eventhubs-ns",
+                "eventhub1", "my-consumer-group", 4);
         System.out.println("Starting run.");
         program.createOwnerships().then(program.run()).block();
         System.out.println("Stopping.");
     }
 
-    public Program(EventHubConnectionStringProperties properties, BlobContainerAsyncClient containerClient,
-            String eventHubName, String consumerGroup, int numberOfPartitions) {
-        this.properties = properties;
+    public Program(BlobContainerAsyncClient containerClient, String fullyQualifiedNamespace, String eventHubName,
+            String consumerGroup, int numberOfPartitions) {
         this.checkpointStore = new BlobCheckpointStore(containerClient);
+        this.fullyQualifiedNamespace = fullyQualifiedNamespace;
         this.eventHubName = eventHubName;
         this.consumerGroup = consumerGroup;
         this.ownerId = UUID.randomUUID().toString();
@@ -89,10 +84,12 @@ public class Program {
     }
 
     private PartitionOwnership createPartitionOwnershipRequest(final String partitionIdToClaim) {
-        final PartitionOwnership previousOwnership = partitionOwnerships.get(partitionIdToClaim);
+        final PartitionOwnership previousOwnership = partitionOwnerships != null
+                ? partitionOwnerships.get(partitionIdToClaim)
+                : null;
 
         return new PartitionOwnership()
-                .setFullyQualifiedNamespace(properties.getFullyQualifiedNamespace())
+                .setFullyQualifiedNamespace(fullyQualifiedNamespace)
                 .setOwnerId(ownerId)
                 .setPartitionId(partitionIdToClaim)
                 .setConsumerGroup(consumerGroup)

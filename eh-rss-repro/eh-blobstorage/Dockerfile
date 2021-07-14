@@ -28,6 +28,6 @@ ENTRYPOINT ["java", \
 "-XX:NativeMemoryTracking=detail", \
 "-agentpath:/usr/local/jprofiler12.0.3/bin/linux-x64/libjprofilerti.so=port=8849", \
 "-jar", \
- "run/eh-blobstorage", \
- "-D exec.mainClass=\"com.contoso.anuchan.App\""]
+ "run/eh-blobstorage.jar", \
+ "-D exec.mainClass=\"com.conniey.Program\""]
 
