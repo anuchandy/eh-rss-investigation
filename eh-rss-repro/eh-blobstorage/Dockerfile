@@ -1,8 +1,14 @@
 FROM mcr.microsoft.com/java/jdk:11-zulu-alpine
 CMD uname
 
+RUN apk add libc6-compat
+RUN ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2
+
+FROM mcr.microsoft.com/java/jdk:11-zulu-alpine
+CMD uname
+
 # artifact: copy the main jar and dir containing dependency jars
-ADD target/standalone-event-hub-receiver.jar /run/standalone-event-hub-receiver.jar
+ADD target/eh-blobstorage.jar /run/eh-blobstorage.jar
 COPY target/dependency-jars /run/dependency-jars
 
 # jprofiler: jprofiler-agent requires ld-linux-x86-64.so.2
@@ -22,6 +28,6 @@ ENTRYPOINT ["java", \
 "-XX:NativeMemoryTracking=detail", \
 "-agentpath:/usr/local/jprofiler12.0.3/bin/linux-x64/libjprofilerti.so=port=8849", \
 "-jar", \
- "run/standalone-event-hub-receiver.jar", \
- "-D exec.mainClass=\"com.contoso.anuchan.App\""]
+ "run/eh-blobstorage.jar", \
+ "-D exec.mainClass=\"com.conniey.Program\""]
 

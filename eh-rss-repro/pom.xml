@@ -15,7 +15,9 @@
       <modules>
         <module>standalone-event-hub-receiver</module>
         <module>standalone-event-hub-receiver-old</module>
+        <module>eh-blobstorage</module>
       </modules>
     </profile>
   </profiles>
+
 </project>
